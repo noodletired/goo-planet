@@ -1,0 +1,32 @@
+{
+	"name": "goo-planet",
+	"version": "0.1.0",
+	"description": "Web goo balls inspired by World of Goo",
+	"author": "Keagan Godfrey",
+	"license": "UNLICENSED",
+	"private": true,
+	"keywords": [
+		"goo",
+		"planet",
+		"web",
+		"experiment"
+	],
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"serve": "vite preview"
+	},
+	"dependencies": {
+		"pixi.js": "^6.2.2",
+		"planck": "^1.0.0-alpha.3",
+		"vue": "^3.2.31"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-vue": "^1.10.2",
+		"eslint": "^7.32.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-vue": "^7.20.0",
+		"sass": "^1.49.9",
+		"vite": "^2.8.6"
+	}
+}
