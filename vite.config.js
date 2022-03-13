@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import path from 'path';
-import viteStylelint from '@amatlash/vite-plugin-stylelint';
 import vue from '@vitejs/plugin-vue';
 
 /**
@@ -30,13 +29,6 @@ export default defineConfig({
 				// SCSS configuration
 				additionalData: `@use '~/styles/_globals.scss' as *;`,
 			},
-		},
-	},
-
-	build: {
-		// https://rollupjs.org/guide/en/#big-list-of-options
-		rollupOptions: {
-			plugins: [viteStylelint()],
 		},
 	},
 });

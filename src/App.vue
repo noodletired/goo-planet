@@ -3,20 +3,43 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, ref } from 'vue';
+import { Vec2 } from 'planck';
+import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue';
+
+import GameEngine from '~/game/engine';
+import { Delay } from '~/game/utilities/Delay';
 
 export default defineComponent({
 	name: 'Application',
 
 	setup() {
-		const content = (ref < HTMLDivElement) | (null > null);
+		console.log('Starting application');
+		const content = ref(null); // template content
+		const loadingProgress = ref(0);
 
-		onMounted(() => {
-			//content.value?.appendChild(renderer.context.view);
-			//InitialiseGame();
+		// TODO: Load from JSON
+		const engine = new GameEngine({
+			simulatorOptions: {
+				gravity: Vec2.zero, // no gravity!
+			},
+			rendererOptions: {},
 		});
 
-		return { content };
+		onMounted(async () => {
+			engine.run();
+			for (const progress of engine.loader.getProgress()) {
+				this.loadingProgress = progress;
+				await Delay(100);
+			}
+
+			content.value?.appendChild(engine.renderer.context.view);
+		});
+
+		onBeforeUnmount(() => {
+			engine.destroy();
+		});
+
+		return { content, loadingProgress };
 	},
 });
 
@@ -30,8 +53,8 @@ if (import.meta.hot) {
 
 <style scoped lang="scss">
 #content {
-	$color-1: hsl(273, 12%, 18%);
-	$color-2: hsl(207, 32%, 23%);
+	$color-1: rgb(120, 106, 194);
+	$color-2: rgb(113, 97, 195);
 	height: 100%;
 	width: 100%;
 	background: linear-gradient($color-1, $color-2);
