@@ -61,7 +61,7 @@ export default class GameLoader {
 			const progress = this.#currentlyLoadedResources / this.#totalResources;
 			yield progress;
 		}
-		return 1;
+		yield 1;
 	}
 
 	/**

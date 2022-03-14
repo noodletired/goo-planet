@@ -1,11 +1,14 @@
 <template>
-	<div id="content" ref="content" />
+	<div id="content" ref="content">
+		<div v-if="loadingProgress < 1" id="loader" :style="{ '--percent': `${loadingProgress * 100}%` }" />
+	</div>
 </template>
 
 <script>
 import { Vec2 } from 'planck';
 import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue';
 
+import FixedDemoScene from '~/assets/FixedDemoScene';
 import GameEngine from '~/game/engine';
 import { Delay } from '~/game/utilities/Delay';
 
@@ -17,18 +20,20 @@ export default defineComponent({
 		const content = ref(null); // template content
 		const loadingProgress = ref(0);
 
-		// TODO: Load from JSON
 		const engine = new GameEngine({
 			simulatorOptions: {
-				gravity: Vec2.zero, // no gravity!
+				gravity: Vec2.zero(), // no gravity!
 			},
 			rendererOptions: {},
 		});
 
+		// TODO: Load scene from JSON
+		const scene = new FixedDemoScene(engine);
+
 		onMounted(async () => {
-			engine.run();
+			engine.run(scene);
 			for (const progress of engine.loader.getProgress()) {
-				this.loadingProgress = progress;
+				loadingProgress.value = progress;
 				await Delay(100);
 			}
 
@@ -36,6 +41,7 @@ export default defineComponent({
 		});
 
 		onBeforeUnmount(() => {
+			scene.destroy();
 			engine.destroy();
 		});
 
@@ -65,6 +71,53 @@ if (import.meta.hot) {
 		top: 50%;
 		transform: translate(-50%, -50%);
 		border: solid 1px hsl(0, 0%, 90%);
+	}
+
+	#loader {
+		$progress: var(--percent);
+		$height: 2rem;
+		$border-radius: $height * 0.2;
+		$background-size: $height * 2;
+
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		width: 50%;
+		max-width: 15rem;
+		height: $height;
+		border: solid 2px white;
+		border-radius: $border-radius;
+		overflow: hidden;
+
+		&::before {
+			@keyframes shift-background {
+				0% {
+					background-position: 0 0;
+				}
+				100% {
+					background-position: $background-size 0;
+				}
+			}
+
+			content: '';
+			display: block;
+			width: $progress;
+			height: 100%;
+			background: rgb(210, 210, 255);
+			background-image: repeating-linear-gradient(
+				-45deg,
+				rgba(255, 255, 255, 0.2) 25%,
+				transparent 25%,
+				transparent 50%,
+				rgba(255, 255, 255, 0.2) 50%,
+				rgba(255, 255, 255, 0.2) 75%,
+				transparent 75%,
+				transparent
+			);
+			background-size: $background-size $background-size;
+			animation: shift-background 2s linear infinite;
+		}
 	}
 }
 </style>

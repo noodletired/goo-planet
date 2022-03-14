@@ -1,5 +1,7 @@
 import { Circle, Vec2 } from 'planck';
 
+import { drawCircle } from '../utilities/Graphics';
+
 export class GooBall {
 	#size; // determines radius of goo
 	#density; // determines how powerful the goo is
@@ -8,6 +10,7 @@ export class GooBall {
 
 	#world;
 	#physicsBody;
+	#graphics;
 
 	/**
 	 * Create a new goo!
@@ -17,8 +20,8 @@ export class GooBall {
 		world,
 		size = 1,
 		density = 1,
-		position = Vec2.zero,
-		angle = Math.random * Math.PI,
+		position = Vec2.zero(),
+		angle = Math.random() * Math.PI,
 		stickiness = 0.1,
 		bounciness = 0.5,
 	}) {
@@ -40,9 +43,17 @@ export class GooBall {
 
 	/**
 	 * Draw the goo
+	 * @param {PIXI.Container} container to draw the goo on
 	 */
-	render() {
-		// TODO! Attach Pixi sprite
+	render(container) {
+		if (!this.#graphics) {
+			this.#graphics = drawCircle(this.#size);
+			container.addChild(this.#graphics);
+		}
+
+		const position = this.#physicsBody.getPosition();
+		this.#graphics.x = position.x;
+		this.#graphics.y = position.y;
 	}
 
 	/**
@@ -51,7 +62,7 @@ export class GooBall {
 	 */
 	#initPhysics(position, angle) {
 		// Create the body
-		const body = world.createBody({
+		const body = this.#world.createBody({
 			type: 'dynamic',
 			position,
 			angle,

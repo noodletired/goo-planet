@@ -29,9 +29,15 @@ export default class GameRenderer {
 			width: 800,
 			height: 600,
 			antialias: true,
+			backgroundAlpha: 0,
 		};
+		const combinedOptions = { ...defaultOptions, ...rendererOptions };
 
-		this.#context = new Renderer({ ...defaultOptions, ...rendererOptions });
+		// Create the render context
+		this.#context = new Renderer(combinedOptions);
+
+		// Shift scene to center of view
+		this.#scene.setTransform(combinedOptions.width / 2, combinedOptions.height / 2);
 	}
 
 	/**
@@ -39,7 +45,7 @@ export default class GameRenderer {
 	 * @param {String} layerName Name of the layer
 	 * @param {Container} container Container to render
 	 */
-	setLayerContent(layerName, container) {
+	setLayer(layerName, container) {
 		const layer = this.#layers.find(({ name }) => layerName === name);
 		if (!layer) {
 			throw new ReferenceError(`Could not set unknown layer container: ${layerName}`);
@@ -64,14 +70,14 @@ export default class GameRenderer {
 	 * @param {String} layerName Name of the layer
 	 * @returns {Container|null} The named container, or null if the requested layer does not exist
 	 */
-	getLayerContent(layerName) {
+	getLayer(layerName) {
 		const layer = this.#layers.find(({ name }) => layerName === name);
 		if (!layer) {
 			return null;
 		}
 
 		if (!layer.container) {
-			this.SetLayer(layerName, new Container());
+			this.setLayer(layerName, new Container());
 		}
 
 		return layer.container;

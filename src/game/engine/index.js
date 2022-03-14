@@ -1,5 +1,7 @@
 import { settings } from 'pixi.js';
 
+import { Delay } from '../utilities/Delay';
+
 import Clock from './Clock';
 import Loader from './Loader';
 import Simulator from './Simulator';
@@ -31,22 +33,28 @@ export default class GameEngine {
 
 	/**
 	 * Starts the game loop, auto-updating components with clock
+	 * @param {Object} scene optional scene to render
 	 */
-	async run() {
+	async run(scene) {
 		this.#isStopped = false;
 
 		// Load resources
 		if (!this.loader.hasLoadFired) {
+			console.debug('Preloading resources');
 			await this.#preloadResources();
+			console.debug('Resources loaded');
 		}
 
 		// Game loop
+		console.debug('Starting game loop');
 		for await (const dt of this.clock.getUpdates()) {
 			if (this.#isStopped) {
+				console.debug('Stopped game loop');
 				break;
 			}
 
 			this.simulator.update(dt); // Maybe needs a fixed FPS
+			scene?.render(this);
 			this.renderer.render();
 		}
 	}
