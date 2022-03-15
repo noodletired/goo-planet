@@ -1,5 +1,3 @@
-import { Vec2 } from 'planck';
-
 import { GooBall } from '~/game/actors/GooBall';
 import { Planet } from '~/game/actors/Planet';
 import GameEngine from '~/game/engine';
@@ -36,14 +34,6 @@ export default class FixedDemoScene {
 	}
 
 	/**
-	 * Cleans up all objects
-	 */
-	destroy() {
-		this.gooBalls.forEach((actor) => actor.destroy());
-		this.planet.destroy();
-	}
-
-	/**
 	 * Creates the demo scene planet at the origin
 	 */
 	#createPlanet(world) {
@@ -57,7 +47,10 @@ export default class FixedDemoScene {
 		const getPosition = (offset) => {
 			const angle = offset * Math.PI * 2;
 			const distance = (Math.random() + 1.5) * this.#planetRadius;
-			return new Vec2(Math.cos(angle), Math.sin(angle)).mul(distance);
+			return {
+				x: Math.cos(angle) * distance,
+				y: Math.sin(angle) * distance,
+			};
 		};
 
 		this.gooBalls = new Array(this.#gooCount).fill().map(

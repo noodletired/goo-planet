@@ -1,4 +1,4 @@
-import { Circle, Vec2 } from 'planck';
+import { Bodies, Composite } from 'matter-js';
 
 import { drawCircle } from '../utilities/Graphics';
 
@@ -8,7 +8,6 @@ export class GooBall {
 	#stickiness; // 0-1 friction
 	#bounciness; // 0-1 restitution
 
-	#world;
 	#physicsBody;
 	#graphics;
 
@@ -20,25 +19,17 @@ export class GooBall {
 		world,
 		size = 1,
 		density = 1,
-		position = Vec2.zero(),
+		position = { x: 0, y: 0 },
 		angle = Math.random() * Math.PI,
 		stickiness = 0.1,
 		bounciness = 0.5,
 	}) {
-		this.#world = world;
 		this.#size = size;
 		this.#density = density;
 		this.#stickiness = stickiness;
 		this.#bounciness = bounciness;
 
-		this.#initPhysics(position, angle);
-	}
-
-	/**
-	 * Clean up the goo and its physics body
-	 */
-	destroy() {
-		this.#world.destroyBody(this.#physicsBody);
+		this.#initPhysics(world, position, angle);
 	}
 
 	/**
@@ -52,45 +43,28 @@ export class GooBall {
 		}
 
 		// Set position from physics
-		const position = this.#physicsBody.getPosition();
+		const { position } = this.#physicsBody;
 		this.#graphics.x = position.x;
 		this.#graphics.y = position.y;
-
-		// Manually apply gravity (planck does not support force fields)
-		// For now we just send it toward (0, 0)
-		const gravity = 10;
-		const force = position.clone();
-		force.normalize();
-		force.mul(-1 * gravity);
-		this.#physicsBody.applyForce(force, position);
 	}
 
 	/**
 	 * Initialise planck physics body and attach to world
+	 * @param {Composite} world a Composite world/scene object to attach to
+	 * @param {Object} position 2D vector
+	 * @param {Number} angle in radians
 	 * @private
 	 */
-	#initPhysics(position, angle) {
+	#initPhysics(world, { x, y }, angle) {
 		// Create the body
-		const body = this.#world.createBody({
-			type: 'dynamic',
-			position,
+		const body = Bodies.circle(x, y, this.#size, {
 			angle,
-			linearDamping: 0,
-			angularDamping: 0.01,
-			allowSleep: false, // no sleep! busy goo
-			awake: true, // caffeine baby
-			active: true,
-			userData: this, // it's like looking in a mirror
-		});
-
-		// Make it a circle
-		body.createFixture({
-			shape: Circle(this.#size),
 			density: this.#density,
-			friction: this.#stickiness,
+			frictionStatic: this.#stickiness,
 			restitution: this.#bounciness,
 		});
 
 		this.#physicsBody = body;
+		Composite.add(world, body);
 	}
 }

@@ -1,11 +1,11 @@
-import { Circle, Vec2 } from 'planck';
+import { Attractors } from 'matter-attractors';
+import { Body, Bodies, Composite, Vector } from 'matter-js';
 
 import { drawCircle } from '../utilities/Graphics';
 
 export class Planet {
 	#size; // determines radius
 
-	#world;
 	#physicsBody;
 	#graphics;
 
@@ -13,18 +13,10 @@ export class Planet {
 	 * Create a new pkanet!
 	 * @param {Object} configuration
 	 */
-	constructor({ world, size = 50, position = Vec2.zero() }) {
-		this.#world = world;
+	constructor({ world, size = 50, position = { x: 0, y: 0 } }) {
 		this.#size = size;
 
-		this.#initPhysics(position);
-	}
-
-	/**
-	 * Clean up the planet and its physics body
-	 */
-	destroy() {
-		this.#world.destroyBody(this.#physicsBody);
+		this.#initPhysics(world, position);
 	}
 
 	/**
@@ -40,27 +32,26 @@ export class Planet {
 
 	/**
 	 * Initialise planck physics body and attach to world
+	 * @param {Composite} world a Composite world/scene object to attach to
+	 * @param {Object} position 2D vector
 	 * @private
 	 */
-	#initPhysics(position) {
+	#initPhysics(world, { x, y }) {
 		// Create the body
-		const body = this.#world.createBody({
-			type: 'static',
-			position,
-			allowSleep: false,
-			awake: true,
-			active: true,
-			userData: this, // we're geocentric here
-		});
-
-		// Make it a circle
-		body.createFixture({
-			shape: Circle(this.#size),
-			density: 0,
-			friction: 0.5, // TODO: tune this
-			restitution: 0,
+		const body = Bodies.circle(x, y, this.#size, {
+			isStatic: true,
+			frictionStatic: 100,
+			plugin: {
+				attractors: [
+					(bodyA, bodyB) => ({
+						x: (bodyA.position.x - bodyB.position.x) * 1e-6,
+						y: (bodyA.position.y - bodyB.position.y) * 1e-6,
+					}),
+				],
+			},
 		});
 
 		this.#physicsBody = body;
+		Composite.add(world, body);
 	}
 }

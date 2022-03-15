@@ -9,7 +9,8 @@
 		"goo",
 		"planet",
 		"web",
-		"experiment"
+		"experiment",
+		"matter-js"
 	],
 	"scripts": {
 		"dev": "vite",
@@ -17,8 +18,9 @@
 		"serve": "vite preview"
 	},
 	"dependencies": {
+		"matter-attractors": "^0.1.6",
+		"matter-js": "^0.18.0",
 		"pixi.js": "^6.2.2",
-		"planck": "^1.0.0-alpha.3",
 		"vue": "^3.2.31"
 	},
 	"devDependencies": {

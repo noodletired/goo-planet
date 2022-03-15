@@ -5,7 +5,6 @@
 </template>
 
 <script>
-import { Vec2 } from 'planck';
 import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue';
 
 import FixedDemoScene from '~/assets/FixedDemoScene';
@@ -22,7 +21,7 @@ export default defineComponent({
 
 		const engine = new GameEngine({
 			simulatorOptions: {
-				gravity: Vec2.zero(), // no gravity!
+				gravity: { x: 0, y: 0 }, // no gravity!
 			},
 			rendererOptions: {},
 		});
@@ -41,7 +40,6 @@ export default defineComponent({
 		});
 
 		onBeforeUnmount(() => {
-			scene.destroy();
 			engine.destroy();
 		});
 
