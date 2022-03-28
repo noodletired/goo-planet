@@ -22,9 +22,10 @@ export default class GameRenderer {
 
 	/**
 	 * Construct a new game renderer
-	 * @param {PIXI.IRenderOptions} rendererOptions
+	 * @param {PIXI.IRenderOptions} rendererOptions Options passed to Pixi Renderer
+	 * @param pixelScale Scale used for rendering (meters to pixels)
 	 */
-	constructor(rendererOptions = {}) {
+	constructor(rendererOptions = {}, pixelScale = 5) {
 		const defaultOptions = {
 			width: 800,
 			height: 600,
@@ -37,7 +38,7 @@ export default class GameRenderer {
 		this.#context = new Renderer(combinedOptions);
 
 		// Shift scene to center of view
-		this.#scene.setTransform(combinedOptions.width / 2, combinedOptions.height / 2);
+		this.#scene.setTransform(combinedOptions.width / 2, combinedOptions.height / 2, pixelScale, pixelScale);
 	}
 
 	/**

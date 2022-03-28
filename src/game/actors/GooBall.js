@@ -51,9 +51,18 @@ export class GooBall {
 			container.addChild(this.#graphics);
 		}
 
+		// Set position from physics
 		const position = this.#physicsBody.getPosition();
 		this.#graphics.x = position.x;
 		this.#graphics.y = position.y;
+
+		// Manually apply gravity (planck does not support force fields)
+		// For now we just send it toward (0, 0)
+		const gravity = 10;
+		const force = position.clone();
+		force.normalize();
+		force.mul(-1 * gravity);
+		this.#physicsBody.applyForce(force, position);
 	}
 
 	/**

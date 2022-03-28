@@ -62,7 +62,5 @@ export class Planet {
 		});
 
 		this.#physicsBody = body;
-
-		// TODO: add gravity!
 	}
 }

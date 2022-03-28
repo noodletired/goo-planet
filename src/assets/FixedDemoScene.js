@@ -11,8 +11,8 @@ export default class FixedDemoScene {
 	planet = null;
 	gooBalls = [];
 
-	#planetRadius = 50;
-	#gooCount = 50;
+	#planetRadius = 20;
+	#gooCount = 100;
 
 	/**
 	 * Initialises the scene

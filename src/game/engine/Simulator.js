@@ -3,7 +3,7 @@ import { Vec2, World } from 'planck';
 /**
  * A game physics simulator which provides access to a physics objects
  */
-export default class Simulator {
+export default class GameSimulator {
 	#world = null;
 
 	get world() {
