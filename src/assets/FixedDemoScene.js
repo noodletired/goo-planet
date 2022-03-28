@@ -25,6 +25,15 @@ export default class FixedDemoScene {
 	}
 
 	/**
+	 * Update the objects within the scene
+	 * @param {Number} dt time in seconds since last update
+	 * @param {GameEngine} engine
+	 */
+	update(dt, engine) {
+		this.gooBalls.forEach((actor) => actor.update(dt, engine));
+	}
+
+	/**
 	 * Render the scene, choosing render layers for actors
 	 * @param {GameEngine} engine
 	 */
@@ -58,6 +67,7 @@ export default class FixedDemoScene {
 				new GooBall({
 					world,
 					position: getPosition(i / this.#gooCount),
+					size: Math.random() * 0.4 + 0.8,
 				})
 		);
 	}

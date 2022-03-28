@@ -1,8 +1,9 @@
 import { Bodies, Composite } from 'matter-js';
 
+import Actor from '../engine/Actor';
 import { drawCircle } from '../utilities/Graphics';
 
-export class GooBall {
+export class GooBall extends Actor {
 	#size; // determines radius of goo
 	#density; // determines how powerful the goo is
 	#stickiness; // 0-1 friction
@@ -24,12 +25,27 @@ export class GooBall {
 		stickiness = 0.1,
 		bounciness = 0.5,
 	}) {
+		super();
+
 		this.#size = size;
 		this.#density = density;
 		this.#stickiness = stickiness;
 		this.#bounciness = bounciness;
 
 		this.#initPhysics(world, position, angle);
+	}
+
+	/**
+	 * Add behaviours to the goo
+	 * @param {Number} dt time since last frame, useful for scaling impulses
+	 */
+	update(dt) {
+		// Apply torque to roll the goo around
+		const lifetimeSeconds = this.lifetime / 1000;
+		const rollStrength = 0.0001;
+		const directionFrequency = 0.5;
+		const directionPhase = this.uniqueOffset;
+		this.#physicsBody.torque = Math.sin(lifetimeSeconds * directionFrequency + directionPhase) * rollStrength;
 	}
 
 	/**
@@ -49,7 +65,7 @@ export class GooBall {
 	}
 
 	/**
-	 * Initialise planck physics body and attach to world
+	 * Initialise physics body and attach to world
 	 * @param {Composite} world a Composite world/scene object to attach to
 	 * @param {Object} position 2D vector
 	 * @param {Number} angle in radians

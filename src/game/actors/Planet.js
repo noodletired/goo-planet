@@ -1,19 +1,21 @@
-import { Attractors } from 'matter-attractors';
-import { Body, Bodies, Composite, Vector } from 'matter-js';
+import { Bodies, Composite } from 'matter-js';
 
+import Actor from '../engine/Actor';
 import { drawCircle } from '../utilities/Graphics';
 
-export class Planet {
+export class Planet extends Actor {
 	#size; // determines radius
 
 	#physicsBody;
 	#graphics;
 
 	/**
-	 * Create a new pkanet!
+	 * Create a new planet!
 	 * @param {Object} configuration
 	 */
 	constructor({ world, size = 50, position = { x: 0, y: 0 } }) {
+		super();
+
 		this.#size = size;
 
 		this.#initPhysics(world, position);
@@ -31,7 +33,7 @@ export class Planet {
 	}
 
 	/**
-	 * Initialise planck physics body and attach to world
+	 * Initialise physics body and attach to world
 	 * @param {Composite} world a Composite world/scene object to attach to
 	 * @param {Object} position 2D vector
 	 * @private

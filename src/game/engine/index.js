@@ -53,6 +53,7 @@ export default class GameEngine {
 				break;
 			}
 
+			scene?.update(dt, this);
 			this.simulator.update(dt); // Maybe needs a fixed FPS
 			scene?.render(this);
 			this.renderer.render();
