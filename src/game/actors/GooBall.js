@@ -1,4 +1,4 @@
-import { Bodies, Composite } from 'matter-js';
+import { Bodies, Common, Composite, Vector } from 'matter-js';
 
 import Actor from '../engine/Actor';
 import { drawCircle } from '../utilities/Graphics';
@@ -58,10 +58,18 @@ export class GooBall extends Actor {
 			container.addChild(this.#graphics);
 		}
 
-		// Set position from physics
-		const { position } = this.#physicsBody;
+		// Set visuals from physics
+		const { position, velocity } = this.#physicsBody;
 		this.#graphics.x = position.x;
 		this.#graphics.y = position.y;
+		this.#graphics.rotation = Math.atan2(velocity.y, velocity.x) + Math.PI / 2; // rotate to face goo direction
+
+		// If going fast, squeeze along X and stretch along Y
+		const stretchVelocity = 0.7; // threshold for stretchiness
+		const stretchOrder = 0.5; // adds bias toward lower (<1) or higher (>1) velocities
+		const stretch = Common.clamp(Vector.magnitude(velocity) ** stretchOrder / stretchVelocity, 0.95, 1.5);
+		const squeeze = 1.0 / stretch;
+		this.#graphics.scale = { x: squeeze, y: stretch };
 	}
 
 	/**
