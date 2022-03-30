@@ -1,6 +1,8 @@
 <template>
 	<div id="content" ref="content">
-		<div v-if="loadingProgress < 1" id="loader" :style="{ '--percent': `${loadingProgress * 100}%` }" />
+		<div id="fader" :style="{ opacity: isLoading ? 1 : 0 }">
+			<div id="loader" :style="{ '--percent': `${loadingProgress * 100}%` }" :class="{ squish: !isLoading }" />
+		</div>
 	</div>
 </template>
 
@@ -18,6 +20,7 @@ export default defineComponent({
 		console.log('Starting application');
 		const content = ref(null); // template content
 		const loadingProgress = ref(0);
+		const isLoading = ref(true);
 
 		const engine = new GameEngine({
 			simulatorOptions: {
@@ -36,6 +39,8 @@ export default defineComponent({
 				await Delay(100);
 			}
 
+			await Delay(2000); // let the goo settle
+			isLoading.value = false;
 			content.value?.appendChild(engine.renderer.context.view);
 		});
 
@@ -43,7 +48,7 @@ export default defineComponent({
 			engine.destroy();
 		});
 
-		return { content, loadingProgress };
+		return { content, isLoading, loadingProgress };
 	},
 });
 
@@ -71,6 +76,15 @@ if (import.meta.hot) {
 		border: solid 1px hsl(0, 0%, 90%);
 	}
 
+	#fader {
+		position: absolute;
+		z-index: 1;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient($color-1, $color-2);
+		transition: opacity 1s ease;
+	}
+
 	#loader {
 		$progress: var(--percent);
 		$height: 2rem;
@@ -78,6 +92,7 @@ if (import.meta.hot) {
 		$background-size: $height * 2;
 
 		position: absolute;
+		z-index: 2;
 		left: 50%;
 		top: 50%;
 		transform: translate(-50%, -50%);
@@ -87,6 +102,12 @@ if (import.meta.hot) {
 		border: solid 2px white;
 		border-radius: $border-radius;
 		overflow: hidden;
+
+		&.squish {
+			height: 0%;
+			width: 0%;
+			transition: height 0.25s ease, width 0.25s ease 0.1s;
+		}
 
 		&::before {
 			@keyframes shift-background {
@@ -115,6 +136,7 @@ if (import.meta.hot) {
 			);
 			background-size: $background-size $background-size;
 			animation: shift-background 2s linear infinite;
+			transition: width 1s ease;
 		}
 	}
 }
