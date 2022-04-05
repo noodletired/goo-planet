@@ -4,6 +4,7 @@ import { BLEND_MODES } from 'pixi.js';
 import { Decoration } from '~/game/actors/Decoration';
 import { GooBall } from '~/game/actors/GooBall';
 import { Planet } from '~/game/actors/Planet';
+import { PlanetWater } from '~/game/actors/PlanetWater';
 import { UserMouse } from '~/game/actors/UserMouse';
 import { Wheel } from '~/game/actors/Wheel';
 import { asset } from '~/game/utilities/Assets';
@@ -14,6 +15,7 @@ import { asset } from '~/game/utilities/Assets';
 export default class FixedDemoScene {
 	userMouse = null;
 	planet = null;
+	planetWater = null;
 	gooBalls = [];
 	backgroundDecorations = [];
 	foregroundDecorations = [];
@@ -42,6 +44,7 @@ export default class FixedDemoScene {
 	 */
 	update(dt, engine) {
 		this.gooBalls.forEach((actor) => actor.update(dt, engine));
+		this.planetWater.update(dt);
 		this.userMouse.update(dt);
 	}
 
@@ -52,6 +55,7 @@ export default class FixedDemoScene {
 	render({ renderer }) {
 		this.gooBalls.forEach((actor) => actor.render(renderer.getLayer('interactable')));
 		this.planet.render(renderer.getLayer('interactable'));
+		this.planetWater.render(renderer.getLayer('interactable'));
 		this.backgroundDecorations.forEach((actor) => actor.render(renderer.getLayer('background')));
 		this.foregroundDecorations.forEach((actor) => actor.render(renderer.getLayer('decoration')));
 		this.userMouse.render(renderer.getLayer('decoration'));
@@ -69,6 +73,7 @@ export default class FixedDemoScene {
 	 */
 	#createPlanet(world) {
 		this.planet = new Planet({ world, size: this.#planetRadius });
+		this.planetWater = new PlanetWater({ world, radialOffset: this.#planetRadius, height: this.#planetRadius * 0.3 });
 	}
 
 	/**
