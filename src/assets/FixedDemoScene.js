@@ -4,6 +4,7 @@ import { BLEND_MODES } from 'pixi.js';
 import { Decoration } from '~/game/actors/Decoration';
 import { GooBall } from '~/game/actors/GooBall';
 import { Planet } from '~/game/actors/Planet';
+import { UserMouse } from '~/game/actors/UserMouse';
 import { Wheel } from '~/game/actors/Wheel';
 import { asset } from '~/game/utilities/Assets';
 
@@ -11,6 +12,7 @@ import { asset } from '~/game/utilities/Assets';
  * A fixed demo scene until I feel like writing a JSON scene description parser and scene editor
  */
 export default class FixedDemoScene {
+	userMouse = null;
 	planet = null;
 	gooBalls = [];
 	backgroundDecorations = [];
@@ -27,6 +29,7 @@ export default class FixedDemoScene {
 	constructor(engine) {
 		const { world } = engine.simulator;
 
+		this.#createUserMouse(engine);
 		this.#createPlanet(world);
 		this.#createGoo(world);
 		this.#createDecorations(engine.loader);
@@ -39,6 +42,7 @@ export default class FixedDemoScene {
 	 */
 	update(dt, engine) {
 		this.gooBalls.forEach((actor) => actor.update(dt, engine));
+		this.userMouse.update(dt);
 	}
 
 	/**
@@ -50,6 +54,14 @@ export default class FixedDemoScene {
 		this.planet.render(renderer.getLayer('interactable'));
 		this.backgroundDecorations.forEach((actor) => actor.render(renderer.getLayer('background')));
 		this.foregroundDecorations.forEach((actor) => actor.render(renderer.getLayer('decoration')));
+		this.userMouse.render(renderer.getLayer('decoration'));
+	}
+
+	/**
+	 * Creates the mouse controller
+	 */
+	#createUserMouse(engine) {
+		this.userMouse = new UserMouse({ engine });
 	}
 
 	/**

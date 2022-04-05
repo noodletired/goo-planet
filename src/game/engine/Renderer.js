@@ -5,12 +5,16 @@ import { Container, Renderer } from 'pixi.js';
  */
 export default class GameRenderer {
 	#scene = new Container();
-	#context = null;
+	#context = null; // PIXI.Renderer
 	#layers = [
 		{ name: 'background', container: null },
 		{ name: 'interactable', container: null },
 		{ name: 'decoration', container: null },
 	];
+
+	get canvas() {
+		return this.#context.view;
+	}
 
 	get context() {
 		return this.#context;

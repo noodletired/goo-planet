@@ -1,6 +1,6 @@
 <template>
 	<div id="content" ref="content">
-		<div id="fader" :style="{ opacity: isLoading ? 1 : 0 }">
+		<div id="fader" :class="{ hide: !isLoading }">
 			<div id="loader" :style="{ '--percent': `${loadingProgress * 100}%` }" :class="{ squish: !isLoading }" />
 		</div>
 	</div>
@@ -82,7 +82,13 @@ if (import.meta.hot) {
 		width: 100%;
 		height: 100%;
 		background: linear-gradient($color-1, $color-2);
+		opacity: 1;
 		transition: opacity 1s ease;
+
+		&.hide {
+			opacity: 0;
+			pointer-events: none;
+		}
 	}
 
 	#loader {

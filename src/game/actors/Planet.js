@@ -1,6 +1,7 @@
 import { Bodies, Composite } from 'matter-js';
 
 import Actor from '../engine/Actor';
+import { CollisionCategories } from '../utilities/Collisions';
 import { drawCircle } from '../utilities/Graphics';
 
 export class Planet extends Actor {
@@ -50,6 +51,11 @@ export class Planet extends Actor {
 						y: (bodyA.position.y - bodyB.position.y) * 1e-6,
 					}),
 				],
+			},
+			collisionFilter: {
+				group: 0,
+				category: CollisionCategories.RIGID,
+				mask: CollisionCategories.DYNAMIC, // only collide with goo
 			},
 		});
 

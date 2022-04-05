@@ -1,6 +1,7 @@
 import { Bodies, Common, Composite, Vector } from 'matter-js';
 
 import Actor from '../engine/Actor';
+import { CollisionCategories } from '../utilities/Collisions';
 import { drawCircle } from '../utilities/Graphics';
 
 export class GooBall extends Actor {
@@ -86,6 +87,11 @@ export class GooBall extends Actor {
 			density: this.#density,
 			frictionStatic: this.#stickiness,
 			restitution: this.#bounciness,
+			collisionFilter: {
+				group: 0,
+				category: CollisionCategories.DYNAMIC,
+				mask: CollisionCategories.PHYSICS | CollisionCategories.MOUSE, // collide with all physics and allow mouse control
+			},
 		});
 
 		this.#physicsBody = body;
