@@ -1,5 +1,7 @@
-import Matter, { Engine } from 'matter-js';
+import Matter, { Common, Engine } from 'matter-js';
 import MatterAttractors from 'matter-attractors';
+import PolygonDecomp from 'poly-decomp';
+Common.setDecomp(PolygonDecomp);
 
 // Matter plugins
 Matter.use(MatterAttractors);

@@ -43,7 +43,7 @@ export class GooBall extends Actor {
 	update(dt) {
 		// Apply torque to roll the goo around
 		const lifetimeSeconds = this.lifetime / 1000;
-		const rollStrength = 0.0001;
+		const rollStrength = 5 * 1e-5;
 		const directionFrequency = 0.5;
 		const directionPhase = this.uniqueOffset;
 		this.#physicsBody.torque = Math.sin(lifetimeSeconds * directionFrequency + directionPhase) * rollStrength;
@@ -86,6 +86,7 @@ export class GooBall extends Actor {
 			angle,
 			density: this.#density,
 			frictionStatic: this.#stickiness,
+			frictionAir: 0.005,
 			restitution: this.#bounciness,
 			collisionFilter: {
 				group: 0,

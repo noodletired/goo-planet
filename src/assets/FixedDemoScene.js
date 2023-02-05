@@ -21,7 +21,7 @@ export default class FixedDemoScene {
 	foregroundDecorations = [];
 
 	#planetRadius = 20;
-	#gooCount = 100;
+	#gooCount = 50;
 
 	/**
 	 * Initialises the scene
@@ -73,7 +73,14 @@ export default class FixedDemoScene {
 	 */
 	#createPlanet(world) {
 		this.planet = new Planet({ world, size: this.#planetRadius });
-		this.planetWater = new PlanetWater({ world, radialOffset: this.#planetRadius, height: this.#planetRadius * 0.3 });
+		this.planetWater = new PlanetWater({
+			world,
+			startAngle: 150,
+			endAngle: 230,
+			radialOffset: this.#planetRadius,
+			height: this.#planetRadius * 0.2,
+			waveHeight: this.#planetRadius * 0.015,
+		});
 	}
 
 	/**
