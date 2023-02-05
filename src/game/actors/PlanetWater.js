@@ -52,8 +52,8 @@ export class PlanetWater extends Actor {
 		const waveBase = new Array(5).fill(0);
 		const backgroundCompression = 0.9; // affects frequencies
 		this.#backgroundWaveVelocity = 30; // affects apparent scroll velocity (phase shift)
-		this.#backgroundWaveOffsets = waveBase.map(() => 2 * (Math.random() - 0.5));
-		this.#backgroundWaveAmplitudes = waveBase.map(() => (Math.random() * 0.7 + 0.3) * waveHeight);
+		this.#backgroundWaveOffsets = waveBase.map(() => (Math.random() - 0.5) * waveHeight);
+		this.#backgroundWaveAmplitudes = waveBase.map(() => (Math.random() * 0.4 + 0.1) * waveHeight);
 		this.#backgroundWaveOffsetStretches = waveBase.map(() => Math.random() * backgroundCompression);
 		this.#backgroundWaveStretches = waveBase.map(() => Math.random() * backgroundCompression);
 
@@ -69,9 +69,9 @@ export class PlanetWater extends Actor {
 		const phase = (this.lifetime / 1000) * this.#backgroundWaveVelocity;
 		for (let i = 0; i < this.#backgroundWaveAmplitudes.length; i++) {
 			result +=
-				this.#backgroundWaveOffsets[i] *
+				this.#backgroundWaveOffsets[i] +
 				this.#backgroundWaveAmplitudes[i] *
-				Math.sin(offset * this.#backgroundWaveStretches[i] + phase * this.#backgroundWaveOffsetStretches[i]);
+					Math.sin(offset * this.#backgroundWaveStretches[i] + phase * this.#backgroundWaveOffsetStretches[i]);
 		}
 		return result;
 	}
