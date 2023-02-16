@@ -1,4 +1,4 @@
-import { Bodies, Collision, Composite, Vector, Vertices } from 'matter-js';
+import { Bodies, Collision, Composite, Vector, Vertices, Events, Engine } from 'matter-js';
 
 import Actor from '../engine/Actor';
 import { CollisionCategories } from '../utilities/Collisions';
@@ -30,14 +30,15 @@ export class PlanetWater extends Actor {
 	 * @param {Object} configuration
 	 */
 	constructor({
+		engine,
 		world,
 		startAngle = 0,
 		endAngle = 360,
 		center = { x: 0, y: 0 },
 		radialOffset = 0,
 		height = 10,
-		waveHeight = height * 0.1,
-		damping = 0.99,
+		waveHeight = height * 0.5,
+		damping = 0.95,
 	}) {
 		super();
 
@@ -52,12 +53,12 @@ export class PlanetWater extends Actor {
 		const waveBase = new Array(5).fill(0);
 		const backgroundCompression = 0.9; // affects frequencies
 		this.#backgroundWaveVelocity = 30; // affects apparent scroll velocity (phase shift)
-		this.#backgroundWaveOffsets = waveBase.map(() => (Math.random() - 0.5) * waveHeight);
-		this.#backgroundWaveAmplitudes = waveBase.map(() => (Math.random() * 0.4 + 0.1) * waveHeight);
+		this.#backgroundWaveOffsets = waveBase.map(() => (Math.random() - 0.5) * waveHeight * 0.5);
+		this.#backgroundWaveAmplitudes = waveBase.map(() => (Math.random() * 0.4 + 0.1) * waveHeight * 0.5);
 		this.#backgroundWaveOffsetStretches = waveBase.map(() => Math.random() * backgroundCompression);
 		this.#backgroundWaveStretches = waveBase.map(() => Math.random() * backgroundCompression);
 
-		this.#initPhysics(world);
+		this.#initPhysics(engine, world);
 	}
 
 	/**
@@ -95,23 +96,19 @@ export class PlanetWater extends Actor {
 			const height = heights[i];
 			const forceLeft = (heights[i - 1] - height) * springConstant;
 			const forceRight = (heights[i + 1] - height) * springConstant;
-			const forceBaseline = (this.#height - height) * springConstant;
+			let forceBaseline = (this.#height - height) * springConstant;
+
+			// Increase force if outside desired height range
+			const baselineDelta = Math.abs(this.#height - height);
+			if (baselineDelta > this.#waveHeight) {
+				forceBaseline *= (1 + baselineDelta / this.#waveHeight) ** 0.5;
+			}
 
 			const acceleration = forceLeft + forceRight + forceBaseline; // mass is constant
 			velocities[i] *= this.#damping;
 			velocities[i] += acceleration;
 			heights[i] += velocities[i];
 		}
-
-		// Cap the maximum height offset at something appropriate
-		const max = this.#height + this.#waveHeight;
-		const min = this.#height - this.#waveHeight;
-		for (let i = 0; i < heights.length; i++) {
-			if (heights[i] > max) heights[i] = max;
-			else if (heights[i] < min) heights[i] = min;
-		}
-
-		this.#waveHeights = heights;
 	}
 
 	/**
@@ -150,10 +147,11 @@ export class PlanetWater extends Actor {
 
 	/**
 	 * Initialise physics body and attach to world
+	 * @param {Engine} engine game engine for attaching collision events to
 	 * @param {Composite} world a Composite world/scene object to attach to
 	 * @private
 	 */
-	#initPhysics(world) {
+	#initPhysics(engine, world) {
 		// Generate a sliced torus
 		const innerVertices = [];
 		const outerVertices = [];
@@ -217,6 +215,32 @@ export class PlanetWater extends Actor {
 			},
 			true
 		);
+
+		const CollisionHandler = ({ pairs }) => {
+			pairs.forEach(({ bodyA, bodyB }) => {
+				const collider = bodyA === body ? bodyB : bodyB === body ? bodyA : null;
+				if (collider) {
+					const displacement = {
+						x: collider.position.x - this.#center.x,
+						y: collider.position.y - this.#center.y,
+					};
+
+					// determine wave index of impact
+					const angle = 90 + Math.atan2(displacement.y, displacement.x) / degToRad;
+					const step = Math.max(0, Math.min(1, (angle - this.#startAngle) / angleBetween));
+					const index = Math.round(step * steps);
+
+					// determine impact power
+					const power = Vector.dot(Vector.normalise(displacement), collider.velocity) * collider.mass;
+
+					// apply impact to wave
+					this.#waveVelocities[index] = power * this.#waveHeight;
+				}
+			});
+		};
+
+		Events.on(engine, 'collisionStart', CollisionHandler.bind(this));
+		Events.on(engine, 'collisionEnd', CollisionHandler.bind(this));
 
 		this.#physicsBody = body;
 		Composite.add(world, body);

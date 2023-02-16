@@ -29,12 +29,10 @@ export default class FixedDemoScene {
 	 * @param {GameEngine} engine
 	 */
 	constructor(engine) {
-		const { world } = engine.simulator;
-
 		this.#createUserMouse(engine);
-		this.#createPlanet(world);
-		this.#createGoo(world);
-		this.#createDecorations(engine.loader);
+		this.#createPlanet(engine);
+		this.#createGoo(engine);
+		this.#createDecorations(engine);
 	}
 
 	/**
@@ -71,10 +69,11 @@ export default class FixedDemoScene {
 	/**
 	 * Creates the demo scene planet at the origin
 	 */
-	#createPlanet(world) {
-		this.planet = new Planet({ world, size: this.#planetRadius });
+	#createPlanet({ simulator }) {
+		this.planet = new Planet({ world: simulator.world, size: this.#planetRadius });
 		this.planetWater = new PlanetWater({
-			world,
+			engine: simulator.engine,
+			world: simulator.world,
 			startAngle: 150,
 			endAngle: 230,
 			radialOffset: this.#planetRadius,
@@ -86,7 +85,7 @@ export default class FixedDemoScene {
 	/**
 	 * Creates the demo scene goo at random locations
 	 */
-	#createGoo(world) {
+	#createGoo({ simulator }) {
 		const getPosition = (offset) => {
 			const angle = offset * Math.PI * 2;
 			const distance = (Math.random() + 1.5) * this.#planetRadius;
@@ -99,7 +98,7 @@ export default class FixedDemoScene {
 		this.gooBalls = new Array(this.#gooCount).fill().map(
 			(x, i) =>
 				new GooBall({
-					world,
+					world: simulator.world,
 					position: getPosition(i / this.#gooCount),
 					size: Math.random() * 0.4 + 0.8,
 				})
@@ -110,7 +109,7 @@ export default class FixedDemoScene {
 	 * Create the demo scene decorations
 	 * @note awaiting this before the Loader.load is fired can deadlock
 	 */
-	async #createDecorations(loader) {
+	async #createDecorations({ loader }) {
 		// Enqueue all resources first
 		const burstTexture = loader.enqueue('burst', asset('burst.png'));
 		const cloudsTexture = loader.enqueue('clouds', asset('clouds.png'));
